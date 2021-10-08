@@ -2,54 +2,56 @@
 
 namespace Assignment4.Entities.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class intitialmigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Tag",
+                name: "Tags",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Tag", x => x.Name);
+                    table.PrimaryKey("PK_Tags", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Users",
                 columns: table => new
                 {
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Email);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Task",
+                name: "Tasks",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    AssignedToEmail = table.Column<string>(type: "nvarchar(100)", nullable: true),
+                    AssignedToId = table.Column<int>(type: "int", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Task", x => x.Id);
+                    table.PrimaryKey("PK_Tasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Task_User_AssignedToEmail",
-                        column: x => x.AssignedToEmail,
-                        principalTable: "User",
-                        principalColumn: "Email",
+                        name: "FK_Tasks_Users_AssignedToId",
+                        column: x => x.AssignedToId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -57,30 +59,31 @@ namespace Assignment4.Entities.Migrations
                 name: "TagTask",
                 columns: table => new
                 {
-                    TagsName = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    TagsId = table.Column<int>(type: "int", nullable: false),
                     TasksId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TagTask", x => new { x.TagsName, x.TasksId });
+                    table.PrimaryKey("PK_TagTask", x => new { x.TagsId, x.TasksId });
                     table.ForeignKey(
-                        name: "FK_TagTask_Tag_TagsName",
-                        column: x => x.TagsName,
-                        principalTable: "Tag",
-                        principalColumn: "Name",
+                        name: "FK_TagTask_Tags_TagsId",
+                        column: x => x.TagsId,
+                        principalTable: "Tags",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_TagTask_Task_TasksId",
+                        name: "FK_TagTask_Tasks_TasksId",
                         column: x => x.TasksId,
-                        principalTable: "Task",
+                        principalTable: "Tasks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "User",
-                columns: new[] { "Email", "Id", "Name" },
-                values: new object[] { "paolo@itu.dk", 1, "Paolo" });
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_Name",
+                table: "Tags",
+                column: "Name",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_TagTask_TasksId",
@@ -88,13 +91,13 @@ namespace Assignment4.Entities.Migrations
                 column: "TasksId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Task_AssignedToEmail",
-                table: "Task",
-                column: "AssignedToEmail");
+                name: "IX_Tasks_AssignedToId",
+                table: "Tasks",
+                column: "AssignedToId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_User_Email",
-                table: "User",
+                name: "IX_Users_Email",
+                table: "Users",
                 column: "Email",
                 unique: true);
         }
@@ -105,13 +108,13 @@ namespace Assignment4.Entities.Migrations
                 name: "TagTask");
 
             migrationBuilder.DropTable(
-                name: "Tag");
+                name: "Tags");
 
             migrationBuilder.DropTable(
-                name: "Task");
+                name: "Tasks");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
         }
     }
 }

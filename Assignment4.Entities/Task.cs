@@ -5,6 +5,7 @@ namespace Assignment4.Entities
 {
     public class Task
     {
+        [Key]
         public int Id { get; set; }
 
         [Required]
@@ -18,10 +19,10 @@ namespace Assignment4.Entities
         [Required]
         public State State { get; set; }
 
-        public IEnumerable<Tag> Tags { get; set; }
+        public List<Tag> Tags { get; set; }
     }
     public enum State
     {
-        New,Active,Resolved,Closed,Removed
+           New,Active,Resolved,Closed,Removed
     }
 }

@@ -23,7 +23,7 @@ namespace Assignment4.Entities
 
         public int Create(TaskDTO task)
         {
-            var cmdText = @"INSERT Task (Title, Description, AssignedToId)
+            var cmdText = @"INSERT Tasks (Title, Description, AssignedToId)
                             VALUES(@Title, @Description, @AssignedToId;
                             SELECT SCOPE_IDENTITY()";
             
@@ -44,7 +44,7 @@ namespace Assignment4.Entities
 
         public void Delete(int taskId)
         {
-            var cmdText = @"DELETE Task WHERE Id = @Id";
+            var cmdText = @"DELETE Tasks WHERE Id = @Id";
 
             using var command = new SqlCommand(cmdText, _connection);
 
@@ -57,14 +57,45 @@ namespace Assignment4.Entities
             CloseConnection();
         }
 
-        public TaskDetailsDTO FindById(int id)
+  public TaskDetailsDTO FindById(int id)
         {
-            return null;
+            var cmdText = @"SELECT t.Id, t.Title, T.Description, t.AssignedToId, u.AssignedToName AS uName, u.AssignedToEmail AS uEmail, t.State 
+                            FROM Tasks AS t
+                            LEFT JOIN Users AS u ON t.AssignedToId = u.Id
+                            JOIN Tags AS ta ON t.tag ......
+                            WHERE t.id = @id";
+
+            using var command = new SqlCommand(cmdText, _connection);
+
+            command.Parameters.AddWithValue("@id", id);
+
+            OpenConnection();
+
+            using var reader = command.ExecuteReader();
+
+            var task = reader.Read()
+                ? new TaskDetailsDTO
+                {
+                    Id = reader.GetInt32("Id"),
+                    Title = reader.GetString("Title"),
+                    Description = reader.GetString("Description"),
+                    AssignedToId = reader.GetInt32("AssignedToId"),
+                    AssignedToName = reader.GetString("uName"),
+                    AssignedToEmail= reader.GetString("uEmail"),
+                    Tags = 
+                    State = reader.GetString("State")
+                }
+                : null;
+
+            CloseConnection();
+
+            return task;
         }
+        
 
         public void Update(TaskDTO task)
         {
-            var cmdText = @"UPDATE Task SET
+            var cmdText = @"UPDATE Tasks SET
                             Title = @Title,
                             Description = @Description,
                             AssignedToId = @AssignedToId
