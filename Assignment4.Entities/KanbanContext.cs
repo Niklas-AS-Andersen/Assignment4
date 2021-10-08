@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 using System.Collections.Generic;
+using Assignment4.Core;
 
 namespace Assignment4.Entities
 {

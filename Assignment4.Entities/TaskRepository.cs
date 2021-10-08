@@ -9,11 +9,11 @@ namespace Assignment4.Entities
 {
     public class TaskRepository: ITaskRepository
     {
-        private readonly SqlConnection _connection;
+        private readonly KanbanContext _context;
 
-        public TaskRepository(SqlConnection connection)
+        public TaskRepository(KanbanContext context)
         {
-            _connection = connection;
+            _context = context;
         }
 
         public IReadOnlyCollection<TaskDTO> All()
@@ -23,73 +23,50 @@ namespace Assignment4.Entities
 
         public int Create(TaskDTO task)
         {
-            var cmdText = @"INSERT Tasks (Title, Description, AssignedToId)
-                            VALUES(@Title, @Description, @AssignedToId;
-                            SELECT SCOPE_IDENTITY()";
-            
-            using var command = new SqlCommand(cmdText, _connection);
+            var t = new Task{
+                Title = task.Title,
+                Description = task.Description,
+                AssignedTo = _context.Users.Find(task.AssignedToId)
+            };
 
-            command.Parameters.AddWithValue("@Title", task.Title);
-            command.Parameters.AddWithValue("@Description", task.Description);
-            command.Parameters.AddWithValue("@AssignedToId", task.AssignedToId);
+            _context.Tasks.Add(t);
 
-            OpenConnection();
+            _context.SaveChanges();
 
-            var id = command.ExecuteScalar();
-
-            CloseConnection();
-
-            return (int)id;
+            return t.Id;
         }
 
         public void Delete(int taskId)
         {
-            var cmdText = @"DELETE Tasks WHERE Id = @Id";
-
-            using var command = new SqlCommand(cmdText, _connection);
-
-            command.Parameters.AddWithValue("@Id", taskId);
-
-            OpenConnection();
-
-            command.ExecuteNonQuery();
-
-            CloseConnection();
+            _context.Tasks.Remove(_context.Tasks.Find(taskId));
+            _context.SaveChanges();
         }
 
   public TaskDetailsDTO FindById(int id)
         {
-            var cmdText = @"SELECT t.Id, t.Title, T.Description, t.AssignedToId, u.AssignedToName AS uName, u.AssignedToEmail AS uEmail, t.State 
-                            FROM Tasks AS t
-                            LEFT JOIN Users AS u ON t.AssignedToId = u.Id
-                            JOIN Tags AS ta ON t.tag ......
-                            WHERE t.id = @id";
+            var task = _context.Tasks.Find(id);
 
-            using var command = new SqlCommand(cmdText, _connection);
+            var taskDto = new TaskDetailsDTO
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                AssignedToId = task.AssignedTo.Id,
+                AssignedToName = task.AssignedTo.Name,
+                AssignedToEmail = task.AssignedTo.Email,
+                Tags = helper(task.Tags),
+                State = task.State
+            };
 
-            command.Parameters.AddWithValue("@id", id);
+            return taskDto;
+        }
 
-            OpenConnection();
-
-            using var reader = command.ExecuteReader();
-
-            var task = reader.Read()
-                ? new TaskDetailsDTO
-                {
-                    Id = reader.GetInt32("Id"),
-                    Title = reader.GetString("Title"),
-                    Description = reader.GetString("Description"),
-                    AssignedToId = reader.GetInt32("AssignedToId"),
-                    AssignedToName = reader.GetString("uName"),
-                    AssignedToEmail= reader.GetString("uEmail"),
-                    Tags = 
-                    State = reader.GetString("State")
-                }
-                : null;
-
-            CloseConnection();
-
-            return task;
+        public IEnumerable<string> helper(List<Tag> tag)
+        {
+            foreach (var item in tag)
+            {
+                yield return item.Name;
+            }
         }
         
 
@@ -101,7 +78,7 @@ namespace Assignment4.Entities
                             AssignedToId = @AssignedToId
                             WHERE Id = @Id";
 
-            using var command = new SqlCommand(cmdText, _connection);
+            using var command = new SqlCommand(ctext);
 
             command.Parameters.AddWithValue("@Id", task.Id);
             command.Parameters.AddWithValue("@Title", task.Title);
@@ -117,22 +94,22 @@ namespace Assignment4.Entities
 
         public void Dispose()
         {
-            _connection.Dispose();
+            _connectiontextDispose();
         }
 
         private void OpenConnection()
         {
-            if (_connection.State == ConnectionState.Closed)
+            if (_context.State == ConnectionState.Closed)
             {
-                _connection.Open();
+                _context.Open();
             }
         }
 
         private void CloseConnection()
         {
-            if (_connection.State == ConnectionState.Open)
+            if (_context.State == ConnectionState.Open)
             {
-                _connection.Close();
+                _context.Close();
             }
         }
     }

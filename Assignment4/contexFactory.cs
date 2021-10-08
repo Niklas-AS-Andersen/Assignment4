@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Assignment4.Entities;
+using Assignment4.Core;
 using System.Collections.Generic;
 
 namespace Assignment4 {
