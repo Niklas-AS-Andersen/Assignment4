@@ -23,51 +23,41 @@ namespace Assignment4 {
 
                 return new KanbanContext(optionsBuilder.Options);
             }
+ public static void Seed(KanbanContext context)
+        {
+        //     context.Database.ExecuteSqlRaw("DELETE dbo.Tags");
+        //     context.Database.ExecuteSqlRaw("DELETE dbo.Tasks");
+        //     context.Database.ExecuteSqlRaw("DELETE dbo.Users");
+        //     context.Database.ExecuteSqlRaw("DELETE dbo.TagTask");
+        //    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.Tags', RESEED, 0)");
+        //     context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.Tasks', RESEED, 0)");
+        //    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.Users', RESEED, 0)");
+        //    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.TagTask', RESEED, 0)");
+        context.Database.EnsureDeleted();
+        context.Database.EnsureCreated();
 
-    public static void Seed(KanbanContext context){
-    context.Database.ExecuteSqlRaw("DELETE dbo.TagTask");
-    context.Database.ExecuteSqlRaw("DELETE dbo.Task");
-    context.Database.ExecuteSqlRaw("DELETE dbo.Tag");
-    context.Database.ExecuteSqlRaw("DELETE dbo.User");
-    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.Task', RESEED, 0)");
-    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.Tag', RESEED, 0)");
-    context.Database.ExecuteSqlRaw("DBCC CHECKIDENT ('dbo.User', RESEED, 0)");
-    
+            //Users
+            var leo = new User { Name = "Leo", Email = "Leo@itu.dk" };
+            var tessa = new User { Name = "Tessa", Email = "Tessa@itu.dk" };
+            var frida = new User { Name = "Frida", Email = "Frida@itu.dk" };
 
-    var user1 = new User {Name= "Tessa", Email="Tessa@mail.dk", Tasks = new List<Task>()};
-    var user2 = new User {Name= "Leonora", Email="Leonora@mail.dk", Tasks = new List<Task>()};
-    var user3 = new User { Name= "Frida", Email="Frida@mail.dk", Tasks = new List<Task>()};
+            //Tags
+            var foodTag = new Tag { Name = "Food" };
+            var freeTimeTag = new Tag { Name = "FreeTime" };
+            var homeworkTag = new Tag { Name = "HomeWork" };
+            var programmingTag = new Tag { Name = "Programming" };
+            var havingFunTag = new Tag { Name = "Having_Fun" };
 
-    var foodTag = new Tag {Name = "food", Tasks = new List<Task>()};
-    var SchoolTag = new Tag { Name = "School", Tasks = new List<Task>()};
-    var FreeTimeTag = new Tag {Name = "Free Time", Tasks = new List<Task>()};
+            //Tasks
+            var task1 = new Task { Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new List<Tag>(){ foodTag, freeTimeTag, havingFunTag } };
+            var task2 = new Task { Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags = new List<Tag>(){ freeTimeTag } };
+            var task3 = new Task { Title = "Make Assignment 4", AssignedTo = frida, Description = "not so fun, but fine", State = State.Active, Tags = new List<Tag>(){ homeworkTag, programmingTag } };
+            var task4 = new Task { Title = "Make Homework2", AssignedTo = leo, Description = "very funyyyy", State = State.Resolved, Tags = new List<Tag>(){ homeworkTag } };
 
-
-    /*var Task1 = new Task { Id = 1, Title= "Make homework", AssignedTo = user1,
-               Description="this is not always a funny task", State = State.Active, Tags = new List<Tag>(){foodTag}}
-    //var Task2 = new Task { Id = 2, Title= "Go for a run", AssignedTo = user3,
-               Description="this is soooo funny", State = State.Active, Tags = new List<Tag>(){FreeTimeTag}};
-    var Task3 = new Task { Id = 3, Title= "Eat a cupcake",
-               Description="mums", State = State.Resolved, Tags = new List<Tag>(){foodTag,FreeTimeTag}};*/
-    
-    // foodTag.Tasks.Add(Task3);
-    // SchoolTag.Tasks.Add(Task1);
-    // FreeTimeTag.Tasks.AddRange(new List<Task>(){Task2, Task3});
-
-    // user1.Tasks.Add(Task1);
-    // user3.Tasks.Add(Task2);
-
-   
-    context.Task.AddRange(
-        new Task {Title= "Go for a run", AssignedTo = user3,
-               Description="this is soooo funny", State = State.Active, Tags = new List<Tag>(){FreeTimeTag}},
-        new Task {Title= "Eat a cupcake",
-               Description="mums", State = State.Resolved, Tags = new List<Tag>(){foodTag,FreeTimeTag}},
-        new Task {Title= "Make homework", AssignedTo = user1,
-               Description="this is not always a funny task", State = State.Active, Tags = new List<Tag>(){foodTag}}
-    );
-
-    context.SaveChanges();
-}
+            context.Tasks.AddRange(
+                task1, task2, task3, task4
+            );
+            context.SaveChanges();
+        }
  }
 }
