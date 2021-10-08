@@ -65,19 +65,20 @@ namespace Assignment4.Entities
 
             if (task == null) return null;
 
-            var taskDto = new TaskDetailsDTO //????
-            {
-                Id = task.Id,
-                Title = task.Title,
-                Description = task.Description,
-                Created = DateTime.Now,
-                AssignedToName = task.AssignedTo.Name,
-                Tags = _context.Tags.Select(t => t.Name).ToList(),
-                State = task.State,
-                StateUpdated = DateTime.Now
-            };
+            var taskDto = from t in _context.Tasks
+                       where t.Id == taskId
+                       select new TaskDetailsDTO(
+                           t.Id,
+                           t.Title,
+                           t.Description,
+                           DateTime.Now,        // Created, skal ændres
+                           t.AssignedTo.Name,
+                           _context.Tags.Select(t => t.Name).ToList(),
+                           t.State,
+                           DateTime.Now         // StateUpdated, skal ændres
+                       );
 
-            return taskDto;
+            return taskDto.FirstOrDefault();
         }
         
 
