@@ -24,6 +24,8 @@ namespace Assignment4.Entities
                 Title = task.Title,
                 Description = task.Description,
                 AssignedTo = _context.Users.Find(task.AssignedToId),
+                Created = DateTime.UtcNow,
+                State = State.New,
                 Tags = tagsHelper(task.Tags)
             };
 
@@ -71,11 +73,11 @@ namespace Assignment4.Entities
                            t.Id,
                            t.Title,
                            t.Description,
-                           DateTime.Now,        // Created, skal ændres
+                           t.Created,
                            t.AssignedTo.Name,
                            _context.Tags.Select(t => t.Name).ToList(),
                            t.State,
-                           DateTime.Now         // StateUpdated, skal ændres
+                           t.StateUpdated
                        );
 
             return taskDto.FirstOrDefault();
@@ -88,10 +90,15 @@ namespace Assignment4.Entities
 
             if (entity == null) return NotFound;
 
+            if (_context.Users.Find(task.AssignedToId) == null) return BadRequest;
+
             entity.Title = task.Title;
             entity.AssignedTo = _context.Users.Find(task.AssignedToId);
             entity.Description = task.Description;
             entity.State = task.State;
+
+            if (entity.State != task.State) entity.StateUpdated = DateTime.UtcNow;
+
             entity.Tags = tagsHelper(task.Tags);
 
             _context.SaveChanges();
@@ -99,29 +106,30 @@ namespace Assignment4.Entities
             return Updated;
         }
 
-        public IReadOnlyCollection<TaskDTO> ReadAll()
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<TaskDTO> ReadAll() =>
+            _context.Tasks
+                .Select(t => new TaskDTO(t.Id, t.Title, _context.Users.Find(t.AssignedTo).Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllRemoved()
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<TaskDTO> ReadAllRemoved() =>
+            _context.Tasks
+                .Select(t => new TaskDTO(t.Id, t.Title, _context.Users.Find(t.AssignedTo).Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Where(t => t.State == State.Removed).ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag)
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) =>
+            _context.Tasks
+                .Select(t => new TaskDTO(t.Id, t.Title, _context.Users.Find(t.AssignedTo).Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Where(t => t.Title == tag).ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId)
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId) =>
+            _context.Tasks
+                .Where(t => _context.Users.Find(t.AssignedTo).Id == userId)
+                .Select(t => new TaskDTO(t.Id, t.Title, _context.Users.Find(t.AssignedTo).Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByState(State state)
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<TaskDTO> ReadAllByState(State state) =>
+            _context.Tasks
+                .Select(t => new TaskDTO(t.Id, t.Title, _context.Users.Find(t.AssignedTo).Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Where(t => t.State == state).ToList().AsReadOnly();
     }
 }

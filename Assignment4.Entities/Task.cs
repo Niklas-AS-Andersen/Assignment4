@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Assignment4.Core;
@@ -17,8 +18,12 @@ namespace Assignment4.Entities
         
         public string? Description { get; set; }
 
+        public DateTime Created { get; set; }
+
         [Required]
         public State State { get; set; }
+
+        public DateTime StateUpdated { get; set; }
 
         public IEnumerable<Tag> Tags { get; set; }
     }
