@@ -28,7 +28,7 @@ namespace Assignment4.Entities
                 AssignedTo = _context.Users.Find(task.AssignedToId),
                 Created = DateTime.UtcNow,
                 State = State.New,
-                Tags = tagsHelper(task.Tags),
+                Tags = tagsHelper(task.Tags).ToHashSet(),
                 StateUpdated = DateTime.UtcNow
             };
 
@@ -105,11 +105,14 @@ namespace Assignment4.Entities
             entity.Title = task.Title;
             entity.AssignedTo = _context.Users.Find(task.AssignedToId);
             entity.Description = task.Description;
-            entity.State = task.State;
-
-            if (entity.State != task.State) entity.StateUpdated = DateTime.UtcNow;
-
-            entity.Tags = tagsHelper(task.Tags);
+            
+            if (entity.State != task.State)
+            { 
+                entity.StateUpdated = DateTime.UtcNow;
+                entity.State = task.State;
+            }
+            
+            entity.Tags = tagsHelper(task.Tags).ToHashSet();
 
             _context.SaveChanges();
 
