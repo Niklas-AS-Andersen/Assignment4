@@ -35,7 +35,7 @@ namespace Assignment4.Entities.Tests
             var homeworkTag = new Tag { Name = "HomeWork" };
             var programmingTag = new Tag { Name = "Programming" };
             var havingFunTag = new Tag { Name = "Having_Fun" };
-            
+
             //Tasks
             var task1 = new Task { Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new HashSet<Tag>(){ foodTag, freeTimeTag, havingFunTag }};
             var task2 = new Task { Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags =new HashSet<Tag>(){ freeTimeTag } };
@@ -112,6 +112,31 @@ namespace Assignment4.Entities.Tests
             Assert.Null(_context.Tasks.Find(1));
         }
 
+
+          [Fact]
+        public void Read_given_id_does_not_exist_returns_null()
+        {
+            var task = _repository.Read(21);
+
+            Assert.Null(task);
+        }
+
+        [Fact]
+        public void Read_given_id_exists_returns_Character()
+        {
+            var repository = new TaskRepository(_context);
+
+            var task = repository.Read(1);
+            Assert.Equal(1, task.Id);
+            Assert.Equal("make cupcakes", task.Title);
+            Assert.Equal("We always like to make cake", task.Description);
+            Assert.Equal(_context.Users.Find(1).Name, task.AssignedToName);
+            Assert.Equal(State.New, task.State);
+            Assert.Equal(task.Tags.ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
+        
+        }
+
+
          [Fact]
         public void Update_updates_existing_character()
         {
@@ -131,17 +156,16 @@ namespace Assignment4.Entities.Tests
 
             Assert.Equal(Response.Updated, updated);
 
-            // var flash = repository.Read(3);
-            // Assert.Equal(3, flash.Id);
-            // Assert.Equal("Barry", flash.GivenName);
-            // Assert.Equal("Allen", flash.Surname);
-            // Assert.Equal("The Flash", flash.AlterEgo);
-            // Assert.Equal(DateTime.Parse("1956-10-01"), flash.FirstAppearance);
-            // Assert.Equal("Forensic scientist", flash.Occupation);
-            // Assert.Equal("Central City", flash.City);
-            // Assert.True(flash.Powers.SetEquals(new[] { "super speed", "intangibility", "superhuman agility", "time travel", "creates and controls lightning", "multiversal knowledge" }));
+            var updatedTask = repository.Read(1);
+            // Assert.Equal(1, updatedTask.Id);
+            // Assert.Equal("make cupcakes", updatedTask.Title);
+            // Assert.Equal("makeeeee cake", updatedTask.Description);
+            // Assert.Equal(_context.Users.Find(1).Name, updatedTask.AssignedToName);
+            // Assert.Equal(State.New, updatedTask.State);
+            //Assert.Equal(updatedTask.Tags.ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
         
         }
+
 
         [Fact]
         public void Update_given_non_existing_id_returns_NotFound()
