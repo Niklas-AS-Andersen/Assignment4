@@ -37,10 +37,10 @@ namespace Assignment4.Entities.Tests
             var havingFunTag = new Tag { Name = "Having_Fun" };
             
             //Tasks
-            var task1 = new Task { Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new HashSet<Tag>(){ foodTag, freeTimeTag, havingFunTag }};
-            var task2 = new Task { Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags =new HashSet<Tag>(){ freeTimeTag } };
-            var task3 = new Task { Title = "Make Assignment 4", AssignedTo = frida, Description = "not so fun, but fine", State = State.Active, Tags = new HashSet<Tag>(){ homeworkTag, programmingTag }  };
-            var task4 = new Task { Title = "Make Homework2", AssignedTo = leo, Description = "very funyyyy", State = State.Resolved, Tags = new HashSet<Tag>(){ homeworkTag }};
+            var task1 = new Task { Id = 1, Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new HashSet<Tag>(){ foodTag, freeTimeTag, havingFunTag }};
+            var task2 = new Task { Id = 2, Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags =new HashSet<Tag>(){ freeTimeTag } };
+            var task3 = new Task { Id = 3, Title = "Make Assignment 4", AssignedTo = frida, Description = "not so fun, but fine", State = State.Active, Tags = new HashSet<Tag>(){ homeworkTag, programmingTag }  };
+            var task4 = new Task { Id = 4, Title = "Make Homework2", AssignedTo = leo, Description = "very funyyyy", State = State.Resolved, Tags = new HashSet<Tag>(){ homeworkTag }};
 
             context.Tasks.AddRange(
                 task1, task2, task3, task4
@@ -83,10 +83,10 @@ namespace Assignment4.Entities.Tests
             var tasks = _repository.ReadAll();
 
             Assert.Collection(tasks,
-                c => Assert.Equal(new TaskDTO(1,"make cupcakes", "Leo", new HashSet<string>(){ "Food", "FreeTimeTag", "Having_Fun"}, State.New), c),
-                c => Assert.Equal(new TaskDTO(2,"take a run", "Tessa", new HashSet<string>(){"FreeTimeTag"}, State.New), c),
-                c => Assert.Equal(new TaskDTO(3,"Make Assignment 4", "Frida", new HashSet<string>(){"Programming", "HomeWork"}, State.Active), c),
-                c => Assert.Equal(new TaskDTO(4,"Make Homework2", "Leo", new HashSet<string>(){ "HomeWork"}, State.Resolved), c)
+                c => Assert.Equal(new TaskDTO(1,"make cupcakes", "Leo", new HashSet<string>(){ "Food", "FreeTimeTag", "Having_Fun"}, State.New).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(2,"take a run", "Tessa", new HashSet<string>(){"FreeTimeTag"}, State.New).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(3,"Make Assignment 4", "Frida", new HashSet<string>(){"Programming", "HomeWork"}, State.Active).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(4,"Make Homework2", "Leo", new HashSet<string>(){ "HomeWork"}, State.Resolved).ToString(), c.ToString())
             );
         }
 
