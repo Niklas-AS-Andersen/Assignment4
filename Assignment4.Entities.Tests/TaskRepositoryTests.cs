@@ -111,10 +111,47 @@ namespace Assignment4.Entities.Tests
             );
         }
 
-        
+        [Fact]
+        public void ReadAllByState_returns_all_task_with_that_State()
+        {
+            var tasks = _repository.ReadAllByState(State.Active);
 
+            Assert.Collection(tasks,
+               c => Assert.Equal(new TaskDTO(3,"Make Assignment 4", "Frida", new List<string>(){"Programming", "HomeWork"}.AsReadOnly(), State.Active).ToString(), c.ToString())
+            );
+        }
 
-        
+        [Fact]
+        public void ReadAllRemoved_returns_all_task_with_State_Removed()
+        {
+            var tasks = _repository.ReadAllRemoved();
+
+            Assert.Empty(tasks);
+ 
+        }
+        [Fact]
+        public void Delete_task_with_state_Active_Returns_Response_Deleted_but_still_exists(){
+            
+            var repository = new TaskRepository(_context);
+
+            var deleted = repository.Delete(3);
+
+            Assert.Equal(Response.Deleted, deleted);
+            Assert.NotNull(_context.Tasks.Find(3));    
+
+        }
+
+         [Fact]
+        public void Delete_task_with_state_Active_Change_State_of_task_to_Removed(){
+            
+            var repository = new TaskRepository(_context);
+
+            var deleted = repository.Delete(3);
+
+            Assert.Equal(Response.Deleted, deleted);
+            Assert.Equal(State.Removed,_context.Tasks.Find(3).State);
+               
+        }
 
          [Fact]
         public void Delete_given_non_existing_id_returns_NotFound()

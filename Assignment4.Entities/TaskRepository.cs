@@ -126,8 +126,9 @@ namespace Assignment4.Entities
 
         public IReadOnlyCollection<TaskDTO> ReadAllRemoved() =>
             _context.Tasks
+                .Where(t => t.State == State.Removed)
                 .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
-                .Where(t => t.State == State.Removed).ToList().AsReadOnly();
+                .ToList().AsReadOnly();
 
         public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) {
 
@@ -155,7 +156,8 @@ namespace Assignment4.Entities
 
         public IReadOnlyCollection<TaskDTO> ReadAllByState(State state) =>
             _context.Tasks
+                .Where(t => t.State.Equals(state))
                 .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
-                .Where(t => t.State == state).ToList().AsReadOnly();
+                .ToList().AsReadOnly();
     }
 }
