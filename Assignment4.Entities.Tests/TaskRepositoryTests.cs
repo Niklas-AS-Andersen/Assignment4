@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
+using System.Linq;
 
 namespace Assignment4.Entities.Tests
 {
@@ -122,7 +123,7 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
-        public void Read_given_id_exists_returns_Character()
+        public void Read_given_id_exists_returns_task()
         {
             var repository = new TaskRepository(_context);
 
@@ -132,13 +133,12 @@ namespace Assignment4.Entities.Tests
             Assert.Equal("We always like to make cake", task.Description);
             Assert.Equal(_context.Users.Find(1).Name, task.AssignedToName);
             Assert.Equal(State.New, task.State);
-            Assert.Equal(task.Tags.ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
-        
+            Assert.Equal(task.Tags.ToList().ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToList().ToString());
         }
 
 
          [Fact]
-        public void Update_updates_existing_character()
+        public void Update_updates_existing_task()
         {
             var repository = new TaskRepository(_context);
 
@@ -157,13 +157,12 @@ namespace Assignment4.Entities.Tests
             Assert.Equal(Response.Updated, updated);
 
             var updatedTask = repository.Read(1);
-            // Assert.Equal(1, updatedTask.Id);
-            // Assert.Equal("make cupcakes", updatedTask.Title);
-            // Assert.Equal("makeeeee cake", updatedTask.Description);
-            // Assert.Equal(_context.Users.Find(1).Name, updatedTask.AssignedToName);
-            // Assert.Equal(State.New, updatedTask.State);
-            //Assert.Equal(updatedTask.Tags.ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
-        
+            Assert.Equal(1, updatedTask.Id);
+            Assert.Equal("make cupcakes", updatedTask.Title);
+            Assert.Equal("makeeeee cake", updatedTask.Description);
+            Assert.Equal(_context.Users.Find(1).Name, updatedTask.AssignedToName);
+            Assert.Equal(State.New, updatedTask.State);
+            Assert.Equal(task.Tags.ToList().ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToList().ToString());
         }
 
 

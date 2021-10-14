@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 using System.IO;
 using Assignment4.Core;
@@ -85,7 +84,7 @@ namespace Assignment4.Entities
                            t.Description,
                            t.Created,
                            t.AssignedTo.Name,
-                           _context.Tags.Select(t => t.Name).ToList(),
+                           t.Tags.Select(t => t.Name).ToList().AsReadOnly(),
                            t.State,
                            t.StateUpdated
                        );
