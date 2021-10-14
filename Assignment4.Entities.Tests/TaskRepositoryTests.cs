@@ -38,10 +38,10 @@ namespace Assignment4.Entities.Tests
             var havingFunTag = new Tag { Name = "Having_Fun" };
 
             //Tasks
-            var task1 = new Task { Id = 1, Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new HashSet<Tag>(){ foodTag, freeTimeTag, havingFunTag }};
-            var task2 = new Task { Id = 2, Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags =new HashSet<Tag>(){ freeTimeTag } };
-            var task3 = new Task { Id = 3, Title = "Make Assignment 4", AssignedTo = frida, Description = "not so fun, but fine", State = State.Active, Tags = new HashSet<Tag>(){ homeworkTag, programmingTag }  };
-            var task4 = new Task { Id = 4, Title = "Make Homework2", AssignedTo = leo, Description = "very funyyyy", State = State.Resolved, Tags = new HashSet<Tag>(){ homeworkTag }};
+            var task1 = new Task { Id = 1, Title = "make cupcakes", AssignedTo = leo, Description = "We always like to make cake", State = State.New, Tags = new List<Tag>(){ foodTag, freeTimeTag, havingFunTag }};
+            var task2 = new Task { Id = 2, Title = "take a run", AssignedTo = tessa, Description = "running is fun", State = State.New, Tags =new List<Tag>(){ freeTimeTag }};
+            var task3 = new Task { Id = 3, Title = "Make Assignment 4", AssignedTo = frida, Description = "not so fun, but fine", State = State.Active, Tags = new List<Tag>(){ homeworkTag, programmingTag }};
+            var task4 = new Task { Id = 4, Title = "Make Homework2", AssignedTo = leo, Description = "very funyyyy", State = State.Resolved, Tags = new List<Tag>(){ homeworkTag }};
 
             context.Tasks.AddRange(
                 task1, task2, task3, task4
@@ -79,17 +79,42 @@ namespace Assignment4.Entities.Tests
         }
 
         [Fact]
-        public void Read_returns_all_tasks()
+        public void ReadAll_returns_all_tasks()
         {
             var tasks = _repository.ReadAll();
 
             Assert.Collection(tasks,
-                c => Assert.Equal(new TaskDTO(1,"make cupcakes", "Leo", new HashSet<string>(){ "Food", "FreeTimeTag", "Having_Fun"}, State.New).ToString(), c.ToString()),
-                c => Assert.Equal(new TaskDTO(2,"take a run", "Tessa", new HashSet<string>(){"FreeTimeTag"}, State.New).ToString(), c.ToString()),
-                c => Assert.Equal(new TaskDTO(3,"Make Assignment 4", "Frida", new HashSet<string>(){"Programming", "HomeWork"}, State.Active).ToString(), c.ToString()),
-                c => Assert.Equal(new TaskDTO(4,"Make Homework2", "Leo", new HashSet<string>(){ "HomeWork"}, State.Resolved).ToString(), c.ToString())
+                c => Assert.Equal(new TaskDTO(1,"make cupcakes", "Leo", new List<string>(){ "Food", "FreeTimeTag", "Having_Fun"}.AsReadOnly(), State.New).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(2,"take a run", "Tessa", new List<string>(){"FreeTimeTag"}.AsReadOnly(), State.New).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(3,"Make Assignment 4", "Frida", new List<string>(){"Programming", "HomeWork"}.AsReadOnly(), State.Active).ToString(), c.ToString()),
+                c => Assert.Equal(new TaskDTO(4,"Make Homework2", "Leo", new List<string>(){ "HomeWork"}.AsReadOnly(), State.Resolved).ToString(), c.ToString())
             );
         }
+
+        [Fact]
+        public void ReadAllByTag_returns_all_task_with_given_tag()
+        {
+            var tasks = _repository.ReadAllByTag("Food");
+
+            Assert.Collection(tasks,
+                c => Assert.Equal(new TaskDTO(1,"make cupcakes", "Leo", new List<string>(){ "Food", "FreeTimeTag", "Having_Fun"}.AsReadOnly(), State.New).ToString(), c.ToString())
+            );
+        }
+
+        [Fact]
+        public void ReadAllByUser_returns_all_task_by_that_user()
+        {
+            var tasks = _repository.ReadAllByUser(2);
+
+            Assert.Collection(tasks,
+               c => Assert.Equal(new TaskDTO(2,"take a run", "Tessa", new List<string>(){"FreeTimeTag"}.AsReadOnly(), State.New).ToString(), c.ToString())
+            );
+        }
+
+        
+
+
+        
 
          [Fact]
         public void Delete_given_non_existing_id_returns_NotFound()
@@ -133,7 +158,7 @@ namespace Assignment4.Entities.Tests
             Assert.Equal("We always like to make cake", task.Description);
             Assert.Equal(_context.Users.Find(1).Name, task.AssignedToName);
             Assert.Equal(State.New, task.State);
-            Assert.Equal(task.Tags.ToList().ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToList().ToString());
+            Assert.Equal(task.Tags.ToList().ToString(), new List<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
         }
 
 
@@ -162,7 +187,7 @@ namespace Assignment4.Entities.Tests
             Assert.Equal("makeeeee cake", updatedTask.Description);
             Assert.Equal(_context.Users.Find(1).Name, updatedTask.AssignedToName);
             Assert.Equal(State.New, updatedTask.State);
-            Assert.Equal(task.Tags.ToList().ToString(), new HashSet<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToList().ToString());
+            Assert.Equal(task.Tags.ToList().ToString(), new List<string>(){"Food", "FreeTimeTag", "Having_Fun"}.ToString());
         }
 
 

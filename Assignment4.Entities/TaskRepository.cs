@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using Assignment4.Core;
 using static Assignment4.Core.Response;
+using Microsoft.EntityFrameworkCore;
 
 namespace Assignment4.Entities
 {
@@ -120,28 +121,41 @@ namespace Assignment4.Entities
 
         public IReadOnlyCollection<TaskDTO> ReadAll() =>
             _context.Tasks
-                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
                 .ToList().AsReadOnly();
 
         public IReadOnlyCollection<TaskDTO> ReadAllRemoved() =>
             _context.Tasks
-                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
                 .Where(t => t.State == State.Removed).ToList().AsReadOnly();
 
-        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) =>
-            _context.Tasks
-                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
-                .Where(t => t.Title == tag).ToList().AsReadOnly();
+        public IReadOnlyCollection<TaskDTO> ReadAllByTag(string tag) {
+
+            var tasks = _context.Tasks.Include(t => t.Tags).Select(t => t);
+            var tempList = new List<TaskDTO>();
+
+            foreach (var task in tasks)
+            {
+                var tagname = task.Tags.Select(t => t.Name);
+                if(tagname.Contains(tag)) {
+                    tempList.Add(new TaskDTO(task.Id, task.Title, task.AssignedTo.Name, task.Tags.Select(t => t.Name).ToList().AsReadOnly(), task.State));
+                }
+                
+            }
+
+            return tempList.AsReadOnly();
+
+        }
 
         public IReadOnlyCollection<TaskDTO> ReadAllByUser(int userId) =>
             _context.Tasks
                 .Where(t => t.AssignedTo.Id == userId)
-                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
                 .ToList().AsReadOnly();
 
         public IReadOnlyCollection<TaskDTO> ReadAllByState(State state) =>
             _context.Tasks
-                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToHashSet(), t.State))
+                .Select(t => new TaskDTO(t.Id, t.Title, t.AssignedTo.Name, t.Tags.Select(t => t.Name).ToList().AsReadOnly(), t.State))
                 .Where(t => t.State == state).ToList().AsReadOnly();
     }
 }
